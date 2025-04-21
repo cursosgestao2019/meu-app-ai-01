@@ -47,7 +47,7 @@ export default function RootLayout({
             <main className="relative flex min-h-screen flex-col">
               {children}
             </main>
-            <Sonner />
+            <Sonner richColors position="top-right" />
           </TanstackQueryProvider>
         </ThemeProvider>
       </body>
