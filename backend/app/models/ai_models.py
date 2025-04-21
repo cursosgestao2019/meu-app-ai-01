@@ -29,3 +29,16 @@ class GuardrailsInput(BaseModel):
 class GuardrailsResponse(BaseModel):
      validated_data: Optional[Dict | List | str] = Field(None, description="Dados validados e estruturados")
      error: Optional[str] = Field(None, description="Mensagem de erro se a validação falhar")
+
+# Novos modelos para o Analisador de Feedback
+class FeedbackAnalysisRequest(BaseModel):
+    text: str = Field(
+        ...,
+        max_length=500, # Limite de caracteres (opcional, mas bom)
+        description="Texto do feedback a ser analisado."
+    )
+
+class FeedbackAnalysisResponse(BaseModel):
+    sentiment: str = Field(..., description="Sentimento detectado (Positivo, Negativo ou Neutro)")
+    summary: str = Field(..., description="Resumo de uma frase do feedback")
+    topics: List[str] = Field(..., description="Lista dos 3 principais tópicos mencionados")

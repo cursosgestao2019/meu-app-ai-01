@@ -102,12 +102,12 @@ app.add_middleware(
 
 # --- Inclusão de Routers ---
 # Inclui os endpoints definidos nos módulos de router importados
-api_prefix = "/api/v1" # Define um prefixo base para todas as rotas de API
+# api_prefix = "/api/v1" # Não precisamos mais definir aqui
 for router_module in router_modules:
      if hasattr(router_module, 'router'):
-         # Usar import relativo para o router aqui também
-         app.include_router(router_module.router, prefix=api_prefix, tags=["AI Services"]) # Adiciona tags para Swagger UI
-         logger.info(f"Router de {router_module.__name__} incluído com prefixo {api_prefix}.")
+         # Remover o argumento prefix daqui, pois o router já tem /api/v1
+         app.include_router(router_module.router, tags=["AI Services"]) # Removido prefix=api_prefix
+         logger.info(f"Router de {router_module.__name__} incluído (prefixo definido no próprio router).") # Mensagem ajustada
      else:
          logger.warning(f"Módulo {router_module.__name__} não possui um atributo 'router'.")
 
