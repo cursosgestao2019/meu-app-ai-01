@@ -79,6 +79,7 @@ frontend_url = os.getenv("NEXT_PUBLIC_SITE_URL", "http://localhost:3000") # Defa
 origins = [
     frontend_url, # URL principal do frontend (lida do .env.local da raiz)
      "http://localhost:8000", # Permitir acesso da própria API (para testes/docs)
+     "https://meu-app-ai-01.vercel.app", # ADICIONADO: URL de produção Vercel
      # Adicione outras URLs de desenvolvimento/produção aqui se necessário
      # Ex: URL do Codespaces, Vercel Preview, etc.
 ]
