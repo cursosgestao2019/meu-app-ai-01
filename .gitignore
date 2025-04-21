@@ -95,3 +95,86 @@ backend/.coverage*
 
 # Sentry
 .sentryclirc
+
+# ---- Environments ----
+# Ignora todos os .env exceto o .env.example
+.env
+.env.*
+!.env.example
+
+# Ignora especificamente o .env do backend (já coberto por .env.*, mas bom ter explícito)
+/backend/.env
+# Ignora o ambiente virtual do backend
+/backend/venv/
+
+# ---- Byte-compiled / optimized / DLL files ----
+__pycache__/
+*.py[cod]
+*$py.class
+
+# ---- Outras regras existentes ----
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# Python Backend (revisado - algumas redundantes agora)
+# backend/venv/ -> movido para Environments
+# backend/.env* -> movido para Environments
+# backend/__pycache__/ -> coberto por __pycache__/
+backend/htmlcov/
+backend/.pytest_cache/
+backend/*.egg-info/
+backend/build/
+backend/dist/
+backend/.coverage*
+
+# ... (mantém Sentry, Logs, IDE, OS generated files existentes) ...
+
+# Logs
+logs
+*.log
+lerna-debug.log*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# IDE files
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.sublime-project
+*.sublime-workspace
+
+# OS generated files
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Sentry
+.sentryclirc
+
+# ---- Adições de Segurança Essenciais ----
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments Raiz (Explícito)
+.env
+.env.*
+!.env.example
+
+# Backend Env (Garantia Explícita)
+/backend/.env
+/backend/venv/

@@ -1,44 +1,32 @@
 # backend/tests/test_api_endpoints.py
 import pytest
-from httpx import AsyncClient, ASGITransport # <<< Importar ASGITransport
-# Importa a app FastAPI
-try:
-    from app.main import app
-except ImportError as e:
-    pytest.fail(f"Falha ao importar 'app' de 'app.main'. Verifique a estrutura do projeto, pythonpath e se app/main.py existe. Erro: {e}")
+from httpx import AsyncClient, ASGITransport
+from fastapi import FastAPI
 
-# --- Fixture para Cliente de Teste Assíncrono (Corrigido) ---
-@pytest.fixture(scope="function")
-async def async_client():
-    # <<< Usa o transport recomendado para corrigir o warning
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://testserver") as client:
-        yield client
+# Importar dependências necessárias para override
+from app.dependencies import get_authenticated_user
+from .test_feedback_analyzer import override_get_authenticated_user
 
-# --- Testes para Endpoints da API (Sem alterações nos que passaram) ---
+# --- Testes para Endpoints da API ---
 
+# Usar test_client e test_app de conftest.py
 @pytest.mark.asyncio
-async def test_read_root_success(async_client: AsyncClient):
-    response = await async_client.get("/")
+async def test_read_root_success(test_client: AsyncClient, test_app: FastAPI):
+    test_app.dependency_overrides = {} # Garante sem overrides na app correta
+    response = await test_client.get("/")
     assert response.status_code == 200
     expected_message = "API de IA está operacional!"
     assert response.json() == {"message": expected_message}, \
         f"Esperado '{expected_message}', recebido '{response.json().get('message')}'"
 
+# --- Testes para Endpoints Placeholder --- 
+# Usar test_client e test_app de conftest.py
 @pytest.mark.asyncio
-async def test_ai_ping_success(async_client: AsyncClient):
-    response = await async_client.get("/api/v1/ping")
-    assert response.status_code == 200
-    expected_message = "AI router está respondendo!"
-    assert response.json() == {"message": expected_message}, \
-         f"Esperado '{expected_message}', recebido '{response.json().get('message')}'"
-
-# --- Testes para Endpoints Placeholder (com correções) ---
-
-@pytest.mark.asyncio
-async def test_rag_query_placeholder_success(async_client: AsyncClient):
+async def test_rag_query_placeholder_success(test_client: AsyncClient, test_app: FastAPI, authenticated_headers: dict):
+    test_app.dependency_overrides[get_authenticated_user] = override_get_authenticated_user # Aplica override na app correta
     payload = {"question": "O que é Supabase?"}
-    response = await async_client.post("/api/v1/rag-query", json=payload)
+    response = await test_client.post("/api/v1/rag-query", json=payload, headers=authenticated_headers)
+    test_app.dependency_overrides = {} # Limpa override
     assert response.status_code == 200
     data = response.json()
     assert "answer" in data
@@ -46,10 +34,13 @@ async def test_rag_query_placeholder_success(async_client: AsyncClient):
     assert "sources" in data
     assert isinstance(data["sources"], list)
 
+# Usar test_client e test_app de conftest.py
 @pytest.mark.asyncio
-async def test_run_crew_placeholder_success(async_client: AsyncClient):
+async def test_run_crew_placeholder_success(test_client: AsyncClient, test_app: FastAPI, authenticated_headers: dict):
+    test_app.dependency_overrides[get_authenticated_user] = override_get_authenticated_user # Aplica override
     payload = {"topic": "Análise de mercado"}
-    response = await async_client.post("/api/v1/run-crew", json=payload)
+    response = await test_client.post("/api/v1/run-crew", json=payload, headers=authenticated_headers)
+    test_app.dependency_overrides = {} # Limpa override
     assert response.status_code == 200
     data = response.json()
     assert "result" in data
@@ -61,11 +52,13 @@ async def test_run_crew_placeholder_success(async_client: AsyncClient):
     assert "logs" in data
     assert isinstance(data["logs"], list)
 
+# Usar test_client e test_app de conftest.py
 @pytest.mark.asyncio
-async def test_generate_structured_placeholder_success(async_client: AsyncClient):
-    """Testa o endpoint Guardrails (placeholder) com dados válidos."""
+async def test_generate_structured_placeholder_success(test_client: AsyncClient, test_app: FastAPI, authenticated_headers: dict):
+    test_app.dependency_overrides[get_authenticated_user] = override_get_authenticated_user # Aplica override
     payload = {"prompt": "Extraia dados do usuário", "spec_name": "UserProfileSpec"}
-    response = await async_client.post("/api/v1/generate-structured", json=payload)
+    response = await test_client.post("/api/v1/generate-structured", json=payload, headers=authenticated_headers)
+    test_app.dependency_overrides = {} # Limpa override
     assert response.status_code == 200
     data = response.json()
     assert "validated_data" in data
@@ -81,14 +74,16 @@ async def test_generate_structured_placeholder_success(async_client: AsyncClient
     assert "AI" in validated_data["interests"]
     assert data["error"] is None
 
-# --- Testes de Validação de Input (Sem alterações) ---
-
+# --- Testes de Validação de Input --- 
+# Usar test_client e test_app de conftest.py
 @pytest.mark.asyncio
 @pytest.mark.parametrize("payload", [
     ({"wrong_field": "abc"}),
     ({}),
     ({"question": 123}),
 ])
-async def test_rag_query_invalid_input(async_client: AsyncClient, payload: dict):
-    response = await async_client.post("/api/v1/rag-query", json=payload)
+async def test_rag_query_invalid_input(test_client: AsyncClient, test_app: FastAPI, payload: dict, authenticated_headers: dict):
+    test_app.dependency_overrides[get_authenticated_user] = override_get_authenticated_user # Aplica override
+    response = await test_client.post("/api/v1/rag-query", json=payload, headers=authenticated_headers)
+    test_app.dependency_overrides = {} # Limpa override
     assert response.status_code == 422

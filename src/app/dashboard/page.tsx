@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { redirect } from "next/navigation" // Para redirecionamento server-side
 import Link from "next/link"
 import { ModeToggle } from "@/components/ui/mode-toggle" // Botão de tema
+import { MessageSquareText } from "lucide-react"; // Importar ícone
 
 // Página Server Component
 export default async function DashboardPage() {
@@ -63,20 +64,35 @@ export default async function DashboardPage() {
             </Card>
 
             {/* Card para Gerenciar Itens (Placeholder) */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Gerenciar Itens</CardTitle>
-                <CardDescription>Acesse sua lista de itens</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p>Crie, visualize, edite e exclua seus itens cadastrados aqui.</p>
-              </CardContent>
-              <CardFooter>
-                <Button asChild className="w-full">
-                  <Link href="/dashboard/items">Ver Meus Itens</Link>
-                </Button>
-              </CardFooter>
-            </Card>
+            <Link href="/dashboard/items">
+              <Card className="hover:shadow-md transition-shadow">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Gerenciar Itens</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-xs text-muted-foreground">
+                    Crie, visualize, edite e exclua seus itens.
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+
+            {/* Card para Analisador de Feedback (NOVO) */}
+            <Link href="/dashboard/feedback-analyzer">
+              <Card className="hover:shadow-md transition-shadow">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    Analisador de Feedback
+                  </CardTitle>
+                  <MessageSquareText className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-xs text-muted-foreground">
+                    Analise sentimento e tópicos de textos.
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
 
             {/* Card para Editar Perfil (Placeholder) */}
             <Card>
